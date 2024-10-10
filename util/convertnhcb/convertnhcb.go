@@ -19,29 +19,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/grafana/regexp"
-
 	"github.com/prometheus/prometheus/model/histogram"
 	"github.com/prometheus/prometheus/model/labels"
 )
-
-var histogramNameSuffixReplacements = []struct {
-	pattern *regexp.Regexp
-	repl    string
-}{
-	{
-		pattern: regexp.MustCompile(`_bucket$`),
-		repl:    "",
-	},
-	{
-		pattern: regexp.MustCompile(`_sum$`),
-		repl:    "",
-	},
-	{
-		pattern: regexp.MustCompile(`_count$`),
-		repl:    "",
-	},
-}
 
 type TempHistogram struct {
 	BucketCounts map[float64]float64
@@ -164,9 +144,18 @@ func GetHistogramMetricBase(m labels.Labels, suffix string) labels.Labels {
 		Labels()
 }
 
+// We remove the suffixes _bucket, _sum, _count from the metric name.
+// We specifically do not remove the _created suffix as that should
+// be removed by the caller.
 func GetHistogramMetricBaseName(s string) string {
-	for _, rep := range histogramNameSuffixReplacements {
-		s = rep.pattern.ReplaceAllString(s, rep.repl)
+	if r, ok := strings.CutSuffix(s, "_bucket"); ok {
+		return r
+	}
+	if r, ok := strings.CutSuffix(s, "_sum"); ok {
+		return r
+	}
+	if r, ok := strings.CutSuffix(s, "_count"); ok {
+		return r
 	}
 	return s
 }
