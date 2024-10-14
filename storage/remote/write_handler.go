@@ -84,7 +84,6 @@ func NewWriteHandler(logger *slog.Logger, reg prometheus.Registerer, appendable 
 	return h
 }
 
-
 func (h *writeHandler) parseProtoMsg(contentType string) (config.RemoteWriteProtoMsg, error) {
 	contentType = strings.TrimSpace(contentType)
 
@@ -494,7 +493,7 @@ func NewOTLPWriteHandler(logger *slog.Logger, appendable storage.Appendable, con
 	}
 
 	return &otlpWriteHandler{
-		logger: logger,
+		logger:   logger,
 		pipeline: sink,
 	}
 }
