@@ -61,17 +61,22 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/vultr/govultr/v2 v2.17.2
 	go.opentelemetry.io/collector/component v0.111.0
+	go.opentelemetry.io/collector/config/configtelemetry v0.111.0
 	go.opentelemetry.io/collector/consumer v0.111.0
+	go.opentelemetry.io/collector/exporter v0.111.0
 	go.opentelemetry.io/collector/pdata v1.17.0
 	go.opentelemetry.io/collector/processor v0.111.0
 	go.opentelemetry.io/collector/semconv v0.111.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.55.0
-	go.opentelemetry.io/otel v1.30.0
+	go.opentelemetry.io/otel v1.31.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.30.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.30.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.30.0
-	go.opentelemetry.io/otel/sdk v1.30.0
-	go.opentelemetry.io/otel/trace v1.30.0
+	go.opentelemetry.io/otel/exporters/prometheus v0.53.0
+	go.opentelemetry.io/otel/metric v1.31.0
+	go.opentelemetry.io/otel/sdk v1.31.0
+	go.opentelemetry.io/otel/sdk/metric v1.31.0
+	go.opentelemetry.io/otel/trace v1.31.0
 	go.uber.org/atomic v1.11.0
 	go.uber.org/automaxprocs v1.6.0
 	go.uber.org/goleak v1.3.0
@@ -84,7 +89,7 @@ require (
 	google.golang.org/api v0.199.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240903143218-8af14fe29dc1
 	google.golang.org/grpc v1.67.1
-	google.golang.org/protobuf v1.34.2
+	google.golang.org/protobuf v1.35.1
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.31.0
@@ -187,10 +192,8 @@ require (
 	github.com/xhit/go-str2duration/v2 v2.1.0 // indirect
 	go.mongodb.org/mongo-driver v1.14.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
-	go.opentelemetry.io/collector/config/configtelemetry v0.111.0 // indirect
 	go.opentelemetry.io/collector/internal/globalsignal v0.111.0 // indirect
 	go.opentelemetry.io/collector/pipeline v0.111.0 // indirect
-	go.opentelemetry.io/otel/metric v1.30.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.3.1 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/crypto v0.28.0 // indirect

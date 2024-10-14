@@ -383,7 +383,7 @@ func TestOTLPWriteHandler(t *testing.T) {
 	req.Header.Set("Content-Type", "application/x-protobuf")
 
 	appendable := &mockAppendable{}
-	handler := NewOTLPWriteHandler(nil, appendable, func() config.Config {
+	handler := NewOTLPWriteHandler(nil, nil, appendable, func() config.Config {
 		return config.Config{
 			OTLPConfig: config.DefaultOTLPConfig,
 		}
@@ -486,7 +486,7 @@ func TestOTLPDelta(t *testing.T) {
 	log := slog.New(slog.NewTextHandler(&logbuf, &slog.HandlerOptions{Level: slog.LevelWarn}))
 
 	appendable := &mockAppendable{}
-	handler := NewOTLPWriteHandler(log, appendable, func() config.Config {
+	handler := NewOTLPWriteHandler(log, nil, appendable, func() config.Config {
 		return config.Config{
 			OTLPConfig: config.DefaultOTLPConfig,
 		}
