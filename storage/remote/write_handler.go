@@ -38,6 +38,7 @@ import (
 	writev2 "github.com/prometheus/prometheus/prompb/io/prometheus/write/v2"
 	"github.com/prometheus/prometheus/storage"
 
+	deltatocumulative "github.com/open-telemetry/opentelemetry-collector-contrib/processor/deltatocumulativeprocessor"
 	otlptranslator "github.com/prometheus/prometheus/storage/remote/otlptranslator/prometheusremotewrite"
 	"github.com/prometheus/prometheus/util/otel"
 	"go.opentelemetry.io/collector/consumer"
@@ -495,6 +496,7 @@ func NewOTLPWriteHandler(logger *slog.Logger, reg prometheus.Registerer, appenda
 	}
 
 	pl, err := otel.Use(reg,
+		otel.Processor(deltatocumulative.NewFactory(), nil), // TODO: how to pass config?
 		otel.Sink(ex),
 	)
 	if err != nil {
