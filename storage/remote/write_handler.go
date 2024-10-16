@@ -484,9 +484,14 @@ func (h *writeHandler) appendV2(app storage.Appender, req *writev2.Request, rs *
 	return samplesWithoutMetadata, http.StatusBadRequest, errors.Join(badRequestErrs...)
 }
 
+type OTLPOptions struct {
+	// Convert delta samples to their cumulative equivalent by aggregating in-memory
+	ConvertDelta bool
+}
+
 // NewOTLPWriteHandler creates a http.Handler that accepts OTLP write requests and
 // writes them to the provided appendable.
-func NewOTLPWriteHandler(logger *slog.Logger, reg prometheus.Registerer, appendable storage.Appendable, configFunc func() config.Config) http.Handler {
+func NewOTLPWriteHandler(logger *slog.Logger, reg prometheus.Registerer, appendable storage.Appendable, configFunc func() config.Config, opts OTLPOptions) http.Handler {
 	ex := &rwExporter{
 		writeHandler: &writeHandler{
 			logger:     logger,
@@ -496,7 +501,9 @@ func NewOTLPWriteHandler(logger *slog.Logger, reg prometheus.Registerer, appenda
 	}
 
 	pl, err := otel.Use(reg,
-		otel.Processor(deltatocumulative.NewFactory(), nil), // TODO: how to pass config?
+		otel.If(opts.ConvertDelta,
+			otel.Processor(deltatocumulative.NewFactory(), otel.DefaultConfig),
+		),
 		otel.Sink(ex),
 	)
 	if err != nil {

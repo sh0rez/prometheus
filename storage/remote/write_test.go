@@ -387,7 +387,7 @@ func TestOTLPWriteHandler(t *testing.T) {
 		return config.Config{
 			OTLPConfig: config.DefaultOTLPConfig,
 		}
-	})
+	}, OTLPOptions{})
 
 	recorder := httptest.NewRecorder()
 	handler.ServeHTTP(recorder, req)
@@ -486,11 +486,10 @@ func TestOTLPDelta(t *testing.T) {
 	log := slog.New(slog.NewTextHandler(&logbuf, &slog.HandlerOptions{Level: slog.LevelWarn}))
 
 	appendable := &mockAppendable{}
-	handler := NewOTLPWriteHandler(log, nil, appendable, func() config.Config {
-		return config.Config{
-			OTLPConfig: config.DefaultOTLPConfig,
-		}
-	}).(*otlpWriteHandler)
+	cfg := func() config.Config {
+		return config.Config{OTLPConfig: config.DefaultOTLPConfig}
+	}
+	handler := NewOTLPWriteHandler(log, nil, appendable, cfg, OTLPOptions{ConvertDelta: true})
 
 	md := pmetric.NewMetrics()
 	ms := md.ResourceMetrics().AppendEmpty().ScopeMetrics().AppendEmpty().Metrics()

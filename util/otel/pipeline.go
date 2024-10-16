@@ -15,6 +15,7 @@ package otel
 import (
 	"context"
 	"errors"
+	"slices"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.opentelemetry.io/collector/component"
@@ -23,6 +24,8 @@ import (
 	"go.opentelemetry.io/collector/pdata/pmetric"
 	"go.opentelemetry.io/collector/processor"
 )
+
+var DefaultConfig component.Config
 
 type Step = func(set Settings, next consumer.Metrics) (consumer.Metrics, error)
 
@@ -33,7 +36,7 @@ func Sink(ex consumer.Metrics) Step {
 }
 
 func Processor(fac processor.Factory, cfg component.Config) Step {
-	if cfg == nil {
+	if cfg == DefaultConfig {
 		cfg = fac.CreateDefaultConfig()
 	}
 	return func(set Settings, next consumer.Metrics) (consumer.Metrics, error) {
@@ -42,7 +45,7 @@ func Processor(fac processor.Factory, cfg component.Config) Step {
 }
 
 func Exporter(fac exporter.Factory, cfg component.Config) Step {
-	if cfg == nil {
+	if cfg == DefaultConfig {
 		cfg = fac.CreateDefaultConfig()
 	}
 	return func(set Settings, _ consumer.Metrics) (consumer.Metrics, error) {
@@ -51,7 +54,7 @@ func Exporter(fac exporter.Factory, cfg component.Config) Step {
 }
 
 func Use(reg prometheus.Registerer, steps ...Step) (Pipeline, error) {
-	pl := pipeline{steps: make([]consumer.Metrics, len(steps))}
+	pl := pipeline{steps: make([]consumer.Metrics, 0, len(steps))}
 
 	tel, err := TelemetrySettings(reg)
 	if err != nil {
@@ -65,14 +68,28 @@ func Use(reg prometheus.Registerer, steps ...Step) (Pipeline, error) {
 		}
 
 		create := steps[i]
-		pl.steps[i], err = create(set, next)
+		if create == nil {
+			continue
+		}
+
+		next, err = create(set, next)
 		if err != nil {
 			return nil, err
 		}
-		next = pl.steps[i]
+		pl.steps = append(pl.steps, next)
 	}
 
+	// reverse to represent steps in order they are called
+	slices.Reverse(pl.steps)
+
 	return pl, nil
+}
+
+func If(ok bool, step Step) Step {
+	if ok {
+		return step
+	}
+	return nil
 }
 
 type Pipeline interface {
