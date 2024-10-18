@@ -15,7 +15,6 @@ package remote
 
 import (
 	"bytes"
-	"context"
 	"errors"
 	"log/slog"
 	"net/http"
@@ -507,10 +506,16 @@ func TestOTLPDelta(t *testing.T) {
 		dp.SetTimestamp(pcommon.NewTimestampFromTime(ts.Add(time.Duration(i) * time.Second)))
 	}
 
-	ctx := context.Background()
-	if err := handler.pipeline.ConsumeMetrics(ctx, md); err != nil {
-		t.Fatal(err)
-	}
+	proto, err := pmetricotlp.NewExportRequestFromMetrics(md).MarshalProto()
+	require.NoError(t, err)
+
+	req, err := http.NewRequest("", "", bytes.NewReader(proto))
+	require.NoError(t, err)
+	req.Header.Set("Content-Type", "application/x-protobuf")
+
+	rec := httptest.NewRecorder()
+	handler.ServeHTTP(rec, req)
+	require.Equal(t, http.StatusOK, rec.Result().StatusCode)
 
 	if logbuf.Len() > 0 {
 		t.Fatal(logbuf.String())
